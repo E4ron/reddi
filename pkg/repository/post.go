@@ -54,7 +54,7 @@ func (r *PostPostgres) Create(post *models.InputPost) (*models.OutputPost, error
 	return &models.OutputPost{
 		Id:         id,
 		CreateDate: timeNow,
-	}
+	}, nil
 }
 func (r *PostPostgres) Update(post *models.InputUpdatePost) error {
 	setValues := make([]string, 0)
@@ -82,5 +82,9 @@ func (r *PostPostgres) Update(post *models.InputUpdatePost) error {
 	return nil
 }
 func (r *PostPostgres) Delete(id string) error {
-
+	_, err := r.db.Query(`update "Post" set deleted= true where id=$1`, id)
+	if err != nil {
+		return err
+	}
+	return nil
 }
