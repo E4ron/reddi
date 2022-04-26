@@ -3,11 +3,12 @@ package models
 import "time"
 
 type Post struct {
-	Id         string
-	Author     string
-	Caption    string
-	Body       string
+	Id         string `json:"id" db:"id"`
+	Author     string `json:"author" db:"author"`
+	Caption    string `json:"caption" db:"caption"`
+	Body       string `json:"body" db:"body"`
 	CreateDate time.Time
+	Deleted    bool `json:"-" db:"deleted"`
 }
 
 type OutputPostList struct {
@@ -16,15 +17,16 @@ type OutputPostList struct {
 }
 
 type InputPost struct {
-	Author  string
-	Caption string
-	Body    string
+	Author  string `binding:"required"`
+	Caption string `binding:"required"`
+	Body    string `binding:"required"`
 }
 type OutputPost struct {
 	Id         string
 	CreateDate time.Time
 }
 type InputUpdatePost struct {
+	Id      string
 	Caption string
 	Body    string
 }
