@@ -46,8 +46,8 @@ func (r *PostPostgres) Create(post *models.InputPost) (*models.OutputPost, error
 	}
 
 	timeNow := time.Now()
-	_, err := r.db.Query(`insert into "Post" (id, author, caption, body, create_date, deleted) values ($1,$2,$3,$4,$5,$6), 	
-                                                                            id, post.Author, post.Caption, post.Body, timeNow, false`)
+	_, err := r.db.Query(`insert into "Post" (id, author, caption, body, create_date, deleted) values ($1,$2,$3,$4,$5,$6)`,
+		id, post.Author, post.Caption, post.Body, timeNow, false)
 	if err != nil {
 		return nil, err
 	}
@@ -73,8 +73,9 @@ func (r *PostPostgres) Update(post *models.InputUpdatePost) error {
 	}
 
 	querySetPart := strings.Join(setValues, ", ")
+	args = append(args, post.Id)
 
-	query := fmt.Sprintf(`update "Post" set %s where id=%s`, querySetPart, post.Id)
+	query := fmt.Sprintf(`update "Post" set %s where id=%d`, querySetPart, argId)
 	_, err := r.db.Query(query, args...)
 	if err != nil {
 		return err

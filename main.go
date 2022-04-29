@@ -11,12 +11,12 @@ func main() {
 	serverInstance := new(Server)
 
 	postgresConfig := repository.Config{
-		Host:     "",
-		Port:     "",
-		UserName: "",
-		Password: "",
-		DBName:   "",
-		SSLMode:  "",
+		Host:     "localhost",
+		Port:     "5432",
+		UserName: "postgres",
+		Password: "123",
+		DBName:   "reddit",
+		SSLMode:  "disable",
 	}
 
 	database, err := repository.NewPostgresDB(postgresConfig)
@@ -38,5 +38,5 @@ func runServer(serverInstance *Server, handlerLayer *handler.Handler) {
 	if err := serverInstance.Run(port, router); err != nil {
 		log.Fatal(err.Error())
 	}
-	log.Println("server started successfully")
+	log.Print("server started successfully")
 }

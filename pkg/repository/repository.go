@@ -12,12 +12,24 @@ type Post interface {
 	Update(post *models.InputUpdatePost) error
 	Delete(id string) error
 }
+
+type Auth interface {
+	SignIn(input *models.InputSignIn) (*models.OutputSignIn, error)
+	SignUp(input *models.InputSignUp) (*models.OutputSignUp, error)
+}
+
+type Session interface {
+	Generate(login string) (string, error)
+}
+
 type Repository struct {
 	Post Post
+	Auth Auth
 }
 
 func NewRepository(db *sqlx.DB) *Repository {
 	return &Repository{
 		Post: NewPostPostgres(db),
+		Auth: NewAuthPostgres(db),
 	}
 }

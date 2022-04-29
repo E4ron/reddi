@@ -3,17 +3,17 @@ package models
 import "time"
 
 type Post struct {
-	Id         string `json:"id" db:"id"`
-	Author     string `json:"author" db:"author"`
-	Caption    string `json:"caption" db:"caption"`
-	Body       string `json:"body" db:"body"`
-	CreateDate time.Time
-	Deleted    bool `json:"-" db:"deleted"`
+	Id         string    `json:"id" db:"id"`
+	Author     string    `json:"author" db:"author"`
+	Caption    string    `json:"caption" db:"caption"`
+	Body       string    `json:"body" db:"body"`
+	CreateDate time.Time `json:"createDate" db:"create_date"`
+	Deleted    bool      `json:"-" db:"deleted"`
 }
 
 type OutputPostList struct {
-	Posts      []Post
-	TotalCount int
+	Posts      []Post `json:"posts"`
+	TotalCount int    `json:"totalCount"`
 }
 
 type InputPost struct {
@@ -29,4 +29,9 @@ type InputUpdatePost struct {
 	Id      string
 	Caption string
 	Body    string
+}
+
+type UriGetPostList struct {
+	Page  string `uri:page`
+	Limit string `uri:limit`
 }
