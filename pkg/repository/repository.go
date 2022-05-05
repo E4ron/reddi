@@ -15,21 +15,24 @@ type Post interface {
 
 type Auth interface {
 	SignIn(input *models.InputSignIn) (*models.OutputSignIn, error)
-	SignUp(input *models.InputSignUp) (*models.OutputSignUp, error)
+	SignUp(input *models.InputSignUp) error
 }
 
 type Session interface {
 	Generate(login string) (string, error)
+	GetAccount(hash string) (*models.Account, error)
 }
 
 type Repository struct {
-	Post Post
-	Auth Auth
+	Post    Post
+	Auth    Auth
+	Session Session
 }
 
 func NewRepository(db *sqlx.DB) *Repository {
 	return &Repository{
-		Post: NewPostPostgres(db),
-		Auth: NewAuthPostgres(db),
+		Post:    NewPostPostgres(db),
+		Auth:    NewAuthPostgres(db),
+		Session: NewSessionPostgres(db),
 	}
 }

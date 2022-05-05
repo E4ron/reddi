@@ -15,17 +15,24 @@ type Post interface {
 
 type Auth interface {
 	SignIn(input *models.InputSignIn) (*models.OutputSignIn, error)
-	SignUp(input *models.InputSignUp) (*models.OutputSignUp, error)
+	SignUp(input *models.InputSignUp) error
+}
+
+type Session interface {
+	GetAccount(hash string) (*models.Account, error)
+	Generate(login string) (string, error)
 }
 
 type Service struct {
-	Post Post
-	Auth Auth
+	Post    Post
+	Auth    Auth
+	Session Session
 }
 
 func NewService(repos *repository.Repository) *Service {
 	return &Service{
-		Post: NewPostService(repos.Post),
-		Auth: NewAuthService(repos.Auth),
+		Post:    NewPostService(repos.Post),
+		Auth:    NewAuthService(repos.Auth),
+		Session: NewSessionService(repos.Session),
 	}
 }

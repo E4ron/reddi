@@ -30,27 +30,32 @@ func (r *PostPostgres) GetById(id string) (*models.Post, error) {
 func (r *PostPostgres) GetList(page int, limit int) (*models.OutputPostList, error) {
 	var output models.OutputPostList
 
-	if err := r.db.Select(&output.Posts, `select * from "Post" where deleted = false order  by create_date desc limit $1 offset  $2`,
+	if err := r.db.Select(&output.Posts, `select * from "Post" where deleted=false 
+                     order by create_date desc limit $1 offset $2`,
 		limit, (page-1)*limit); err != nil {
 		return nil, err
 	}
+
 	if err := r.db.Get(&output.TotalCount, `select count(*) from "Post" where deleted=false`); err != nil {
 		return nil, err
 	}
+
 	return &output, nil
 }
 func (r *PostPostgres) Create(post *models.InputPost) (*models.OutputPost, error) {
 	id := uuid.New().String()
 	if id == "" {
-		return nil, errors.New("generation uuid invalid")
+		return nil, errors.New("generate uuid invalid")
 	}
 
 	timeNow := time.Now()
-	_, err := r.db.Query(`insert into "Post" (id, author, caption, body, create_date, deleted) values ($1,$2,$3,$4,$5,$6)`,
+	_, err := r.db.Query(`insert into "Post" (id, author, caption, body, create_date, deleted) 
+						values ($1, $2, $3, $4, $5, $6)`,
 		id, post.Author, post.Caption, post.Body, timeNow, false)
 	if err != nil {
 		return nil, err
 	}
+
 	return &models.OutputPost{
 		Id:         id,
 		CreateDate: timeNow,
@@ -66,6 +71,7 @@ func (r *PostPostgres) Update(post *models.InputUpdatePost) error {
 		args = append(args, post.Caption)
 		argId++
 	}
+
 	if post.Body != "" {
 		setValues = append(setValues, fmt.Sprintf("body=$%d", argId))
 		args = append(args, post.Body)
@@ -75,17 +81,21 @@ func (r *PostPostgres) Update(post *models.InputUpdatePost) error {
 	querySetPart := strings.Join(setValues, ", ")
 	args = append(args, post.Id)
 
-	query := fmt.Sprintf(`update "Post" set %s where id=%d`, querySetPart, argId)
+	query := fmt.Sprintf(`update "Post" set %s where id=$%d`, querySetPart, argId)
+
 	_, err := r.db.Query(query, args...)
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
+
 func (r *PostPostgres) Delete(id string) error {
-	_, err := r.db.Query(`update "Post" set deleted= true where id=$1`, id)
+	_, err := r.db.Query(`update "Post" set deleted=true where id=$1`, id)
 	if err != nil {
 		return err
 	}
+
 	return nil
 }

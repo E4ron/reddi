@@ -15,7 +15,8 @@ func (h *Handler) SignIn(c *gin.Context) {
 	}
 
 	if err := input.Validate(); err != nil {
-		sendBadRequestError(c, err)
+		sendBadRequestWithMessage(c, err)
+		return
 	}
 
 	output, err := h.services.Auth.SignIn(&input)
@@ -29,6 +30,7 @@ func (h *Handler) SignIn(c *gin.Context) {
 
 func (h *Handler) SignUp(c *gin.Context) {
 	var input models.InputSignUp
+	var output models.OutputSignUp
 
 	if err := c.BindJSON(&input); err != nil {
 		sendBadRequestError(c, err)
@@ -40,11 +42,18 @@ func (h *Handler) SignUp(c *gin.Context) {
 		return
 	}
 
-	output, err := h.services.Auth.SignUp(&input)
+	if err := h.services.Auth.SignUp(&input); err != nil {
+		sendInternalServerError(c, err)
+		return
+	}
+
+	hash, err := h.services.Session.Generate(input.Login)
 	if err != nil {
 		sendInternalServerError(c, err)
 		return
 	}
+
+	output.Session = hash
 
 	c.JSON(http.StatusOK, output)
 }

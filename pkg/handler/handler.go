@@ -22,18 +22,17 @@ func (h Handler) GetRouter() *gin.Engine {
 		auth.POST("/sign-up", h.SignUp)
 	}
 
-	api := router.Group("/api")
+	api := router.Group("/api", h.apiMiddleware)
 	{
 		posts := api.Group("/posts")
 		{
 			posts.GET("/:item_id", h.GetPostById)
 			posts.GET("/list/:page/:limit", h.GetList)
 			posts.POST("", h.Create)
-			posts.PUT("/:tem_id", h.Update)
+			posts.PUT("/:item_id", h.Update)
 			posts.DELETE("/:item_id", h.Delete)
 		}
 	}
 
 	return router
-
 }

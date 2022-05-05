@@ -12,6 +12,7 @@ type PostService struct {
 func NewPostService(repo repository.Post) *PostService {
 	return &PostService{repo: repo}
 }
+
 func (s *PostService) GetById(id string) (*models.Post, error) {
 	return s.repo.GetById(id)
 }

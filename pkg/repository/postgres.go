@@ -9,7 +9,7 @@ import (
 type Config struct {
 	Host     string
 	Port     string
-	UserName string
+	Username string
 	Password string
 	DBName   string
 	SSLMode  string
@@ -17,13 +17,19 @@ type Config struct {
 
 func NewPostgresDB(config Config) (*sqlx.DB, error) {
 	db, err := sqlx.Open("postgres", fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
-		config.Host, config.Port, config.UserName, config.Password, config.DBName, config.SSLMode))
+		config.Host, config.Port, config.Username, config.Password, config.DBName, config.SSLMode))
 	if err != nil {
 		return nil, err
 	}
+
 	err = db.Ping()
 	if err != nil {
 		return nil, err
 	}
+
+	if err = db.Ping(); err != nil {
+		return nil, err
+	}
+
 	return db, nil
 }

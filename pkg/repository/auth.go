@@ -7,8 +7,7 @@ import (
 )
 
 type AuthPostgres struct {
-	db      *sqlx.DB
-	session *SessionPostgres
+	db *sqlx.DB
 }
 
 func (r *AuthPostgres) SignIn(input *models.InputSignIn) (*models.OutputSignIn, error) {
@@ -19,7 +18,6 @@ func (r *AuthPostgres) SignIn(input *models.InputSignIn) (*models.OutputSignIn, 
 		input.Identifier); err != nil {
 		return nil, err
 	}
-	account.Permissions = "admin, moderator, user"
 
 	if err := bcrypt.CompareHashAndPassword([]byte(account.Password), []byte(input.Password)); err != nil {
 		return nil, err
@@ -30,27 +28,19 @@ func (r *AuthPostgres) SignIn(input *models.InputSignIn) (*models.OutputSignIn, 
 	return &output, nil
 }
 
-func (r *AuthPostgres) SignUp(input *models.InputSignUp) (*models.OutputSignUp, error) {
-	var output models.OutputSignUp
-
+func (r *AuthPostgres) SignUp(input *models.InputSignUp) error {
 	passwordHash, err := getPasswordHash(input.Password)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	_, err = r.db.Query(`insert into "Account" (login, password, name, email) 
 		values ($1, $2, $3, $4)`, input.Login, passwordHash, input.Name, input.Email)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	sessionHash, err := r.session.Generate(input.Login)
-	if err != nil {
-		return nil, err
-	}
-
-	output.Session = sessionHash
-	return &output, nil
+	return nil
 }
 
 func getPasswordHash(password string) ([]byte, error) {
@@ -59,7 +49,6 @@ func getPasswordHash(password string) ([]byte, error) {
 
 func NewAuthPostgres(db *sqlx.DB) *AuthPostgres {
 	return &AuthPostgres{
-		db:      db,
-		session: NewSessionPostgres(db),
+		db: db,
 	}
 }

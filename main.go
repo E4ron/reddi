@@ -13,7 +13,7 @@ func main() {
 	postgresConfig := repository.Config{
 		Host:     "localhost",
 		Port:     "5432",
-		UserName: "postgres",
+		Username: "postgres",
 		Password: "123",
 		DBName:   "reddit",
 		SSLMode:  "disable",
